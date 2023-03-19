@@ -20,6 +20,11 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        // Load API key from local.props
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def myProperty = properties.getProperty('apiKey')
+        buildConfigField("String", "API_KEY", "\"$myProperty\"")
     }
 
     buildTypes {

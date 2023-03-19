@@ -6,6 +6,7 @@
 ## Pre-requisites
 - Android Studio Electric Eel (If want to run on IDE)
 - Gradle 7.5
+- APIKey added in `local.properties` with key `apiKey`
 
 > To run using cmd, use `./gradlew assemble` and then install the app using `adb install $path`
 
@@ -21,7 +22,7 @@
 - [x] Implement MVVM connector
 - [x] Implement functionalities
 - [ ] Implement CI/CD on Github
-- [ ] Make the API key fetched securely
+- [x] Make the API key fetched securely
 - [ ] [Optional] Custom Detekt rules to avoid redundant issues
 - [ ] [Optional] More clear documentations
 - [ ] [Optional] Create Wakatime report for spent time (**`startTime - endTime` is not a correct number since I've worked on it on different times**)

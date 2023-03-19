@@ -1,5 +1,6 @@
 package ir.malv.swensonhe.test.api
 
+import ir.malv.swensonhe.test.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -26,7 +27,7 @@ class WeatherApi @Inject constructor(
 ) {
     private val service = retrofit.create(WeatherApiService::class.java)
 
-    private val apiKey = "cea28fc931474e94904232834231803" // TODO(mahdi): Too exposed
+    private val apiKey = BuildConfig.API_KEY
     private val days = 3
     private val aqi = "no"
     private val alerts = "no"
