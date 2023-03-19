@@ -20,7 +20,6 @@
 - [x] Implement API
 - [x] Implement MVVM connector
 - [x] Implement functionalities
-- [ ] Unit tests
 - [ ] Implement CI/CD on Github
 - [ ] Make the API key fetched securely
 - [ ] [Optional] Custom Detekt rules to avoid redundant issues

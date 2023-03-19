@@ -22,9 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.malv.swensonhe.test.R
 import ir.malv.swensonhe.test.repository.LocationData
+import ir.malv.swensonhe.test.ui.theme.darkButtonColor
 
 /**
- * TODO(mahdi): Provide info for params specially [suggestionList]
+ * ## Search box Ui
+ * @param onBackClicked is called when the back button is tapped - Should close the Ui
+ * @param onCloseSuggestions when the bottom arrow is clicked the Ui will remove the suggestions
+ * @param onCityClick when an item was clicked it'll be used for fetching weather
+ * @param onSearchContentChanged when text field text changes
+ * @param suggestionList is a list of cities fetched from autocomplete API
  */
 @Composable
 fun SearchBox(
@@ -33,7 +39,7 @@ fun SearchBox(
     onCityClick: (LocationData) -> Unit,
     onSearchContentChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    suggestionList: List<LocationData> = emptyList(),
+    suggestionList: List<LocationData> = emptyList()
 ) {
     Card(
         modifier = modifier
@@ -61,7 +67,7 @@ fun SearchBox(
                     Icon(
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = "Close search box",
-                        tint = Color(0xFF444E72) // TODO(mahdi): provide a color class
+                        tint = darkButtonColor
                     )
                 }
                 Spacer(Modifier.width(12.dp))
@@ -85,7 +91,7 @@ fun SearchBox(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_close),
-                                    tint = Color(0xFF444E72),
+                                    tint = darkButtonColor,
                                     contentDescription = "Clear search"
                                 )
                             }
@@ -136,7 +142,7 @@ fun SearchBox(
                             .align(Alignment.Center),
                         painter = painterResource(R.drawable.ic_up),
                         contentDescription = "Close suggestions",
-                        tint = Color(0xFF444E72)
+                        tint = darkButtonColor
                     )
                 }
             }
