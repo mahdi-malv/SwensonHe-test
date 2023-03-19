@@ -1,5 +1,5 @@
 # Ui code challenge for SwensonHe company
-> **Status:** <img src="https://img.shields.io/badge/Status-Work%20in%20progress-orange" />
+> <img src="https://img.shields.io/badge/Status-Work%20in%20progress-orange" />
 
 ## Pre-requisites
 - Android Studio Electric Eel (If want to run on IDE)
