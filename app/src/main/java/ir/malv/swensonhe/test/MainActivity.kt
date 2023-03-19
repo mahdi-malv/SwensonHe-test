@@ -4,10 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,9 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.AsyncImage
 import ir.malv.swensonhe.test.ui.theme.WeatherSwensonHeTheme
 
 class MainActivity : ComponentActivity() {
@@ -104,10 +107,13 @@ private fun ForegroundContent(
     }
 
     // Weather
-    Box(
+    CurrentWeather(
+        temperature = 82.4f,
+        iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
+        message = "Clear fucking day here",
+        wind = 3,
+        humidity = 67,
         modifier = Modifier
-            .size(170.dp, 240.dp)
-            .background(Color.Red)
             .constrainAs(weather) {
                 top.linkTo(parent.top)
                 end.linkTo(parent.end)
@@ -117,32 +123,167 @@ private fun ForegroundContent(
     )
 
     // City and date
-    Box(
+    CityAndDate(
         modifier = Modifier
-            .size(200.dp, 60.dp)
-            .background(Color.Green)
             .constrainAs(city) {
                 top.linkTo(time.bottom)
                 end.linkTo(parent.end)
                 bottom.linkTo(weather.top)
                 start.linkTo(parent.start)
-            }
+            },
+        city = "San Francisco",
+        date = "Tuesday, 12 Apr 2022",
     )
 
     // Future days
-    Box(
+    Row(
         modifier = Modifier
-            .size(290.dp, 60.dp)
-            .background(Color.Blue)
+            .fillMaxWidth()
+            .height(72.dp)
             .constrainAs(nextWeathers) {
                 top.linkTo(weather.bottom)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start)
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        NextWeather(
+            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
+            minWeather = 84f,
+            maxWeather = 86.4f,
+            day = "Today"
+        )
+        NextWeather(
+            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
+            minWeather = 84f,
+            maxWeather = 86.4f,
+            day = "Tomorrow"
+        )
+        NextWeather(
+            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
+            minWeather = 84f,
+            maxWeather = 86.4f,
+            day = "Friday"
+        )
+    }
+}
+
+@Composable
+private fun CurrentWeather(
+    temperature: Float,
+    iconUrl: String,
+    message: String,
+    wind: Int,
+    humidity: Int,
+    modifier: Modifier = Modifier,
+) = Column(
+    modifier = modifier,
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
+    AsyncImage(
+        modifier = Modifier.size(90.dp, 90.dp),
+        model = iconUrl,
+        contentDescription = "Current weather", // TODO(mahdi): Use the text to make it clear
+    )
+    Text(
+        text = buildAnnotatedString {
+            pushStyle(SpanStyle(fontSize = 56.sp, fontWeight = FontWeight.Bold))
+            append(temperature.toString())
+            pop()
+            pushStyle(SpanStyle(fontSize = 56.sp, fontWeight = FontWeight.Light))
+            append("°F")
+        },
+        color = Color.White,
+    )
+    Spacer(Modifier.height(8.dp))
+    Text(
+        text = message,
+        color = Color.White,
+        style = TextStyle(fontSize = 16.sp)
+    )
+    Spacer(Modifier.height(8.dp))
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_wind),
+            contentDescription = "Wind $wind MPH",
+            tint = Color.White
+        )
+        Text(
+            text = " $wind mph",
+            color = Color.White
+        )
+        Spacer(Modifier.width(48.dp))
+
+        Icon(
+            painter = painterResource(R.drawable.ic_droplet),
+            contentDescription = "Humidity $humidity percent",
+            tint = Color.White
+        )
+        Text(
+            text = " $humidity%",
+            color = Color.White
+        )
+    }
+}
+
+@Composable
+private fun CityAndDate(
+    city: String,
+    date: String,
+    modifier: Modifier = Modifier
+) = Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
+    Text(
+        text = city,
+        color = Color.White,
+        style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold)
+    )
+    Text(
+        text = date,
+        color = Color.White,
+        style = TextStyle(fontSize = 16.sp)
     )
 }
 
+/**
+ * ### Ui for displaying weather info of next days
+ */
+@Composable
+fun NextWeather(
+    iconUrl: String,
+    minWeather: Float,
+    maxWeather: Float,
+    day: String,
+    modifier: Modifier = Modifier,
+) = Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+) {
+    AsyncImage(
+        modifier = Modifier.size(32.dp, 32.dp),
+        model = iconUrl,
+        contentDescription = "Weather status"
+    )
+    Text(
+        text = "$minWeather°/$maxWeather°F",
+        color = Color.White,
+        style = TextStyle(fontSize = 12.sp)
+    )
+    Text(
+        text = day,
+        color = Color.White,
+        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
