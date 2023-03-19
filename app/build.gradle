@@ -21,10 +21,17 @@ android {
             useSupportLibrary true
         }
         // Load API key from local.props
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        def myProperty = properties.getProperty('apiKey')
-        buildConfigField("String", "API_KEY", "\"$myProperty\"")
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(new FileInputStream(localPropertiesFile))
+        }
+
+        def apiKey = localProperties.getProperty("apiKey")
+        if (apiKey == null) {
+            apiKey = System.getenv("API_KEY")
+        }
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
