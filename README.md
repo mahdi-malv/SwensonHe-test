@@ -13,14 +13,16 @@
 - [x] Base template
 - [x] Add compose libraries
 - [x] Base Ui
-- [ ] API query
+- [ ] Ui for tablet
+- [x] API query
 - [x] Fetch and request API key
-- [ ] Design API on Retrofit
-- [ ] Implement API
-- [ ] Implement MVVM connector
-- [ ] Implement functionalities
+- [x] Design API on Retrofit
+- [x] Implement API
+- [x] Implement MVVM connector
+- [x] Implement functionalities
 - [ ] Unit tests
 - [ ] Implement CI/CD on Github
+- [ ] Make the API key fetched securely
 - [ ] [Optional] Custom Detekt rules to avoid redundant issues
 - [ ] [Optional] More clear documentations
 - [ ] [Optional] Create Wakatime report for spent time (**`startTime - endTime` is not a correct number since I've worked on it on different times**)
