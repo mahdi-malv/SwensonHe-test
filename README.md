@@ -21,8 +21,5 @@
 - [x] Implement API
 - [x] Implement MVVM connector
 - [x] Implement functionalities
-- [ ] Implement CI/CD on Github
+- [x] Implement CI/CD on Github
 - [x] Make the API key fetched securely
-- [ ] [Optional] Custom Detekt rules to avoid redundant issues
-- [ ] [Optional] More clear documentations
-- [ ] [Optional] Create Wakatime report for spent time (**`startTime - endTime` is not a correct number since I've worked on it on different times**)
