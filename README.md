@@ -6,3 +6,19 @@
 - Gradle 7.5
 
 > To run using cmd, use `./gradlew assemble` and then install the app using `adb install $path`
+
+### Tasks
+- [x] Base template
+- [x] Add compose libraries
+- [x] Base Ui
+- [ ] API query
+- [x] Fetch and request API key
+- [ ] Design API on Retrofit
+- [ ] Implement API
+- [ ] Implement MVVM connector
+- [ ] Implement functionalities
+- [ ] Unit tests
+- [ ] Implement CI/CD on Github
+- [ ] [Optional] Custom Detekt rules to avoid redundant issues
+- [ ] [Optional] More clear documentations
+- [ ] [Optional] Create Wakatime report for spent time (**`startTime - endTime` is not a correct number since I've worked on it on different times**)
