@@ -21,6 +21,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.malv.swensonhe.test.R
+import ir.malv.swensonhe.test.repository.LocationData
 
 /**
  * TODO(mahdi): Provide info for params specially [suggestionList]
@@ -29,10 +30,10 @@ import ir.malv.swensonhe.test.R
 fun SearchBox(
     onBackClicked: () -> Unit,
     onCloseSuggestions: () -> Unit,
-    onCityClick: (String) -> Unit,
+    onCityClick: (LocationData) -> Unit,
     onSearchContentChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    suggestionList: List<String> = emptyList(),
+    suggestionList: List<LocationData> = emptyList(),
 ) {
     Card(
         modifier = modifier
@@ -107,18 +108,12 @@ fun SearchBox(
                             )
                             .padding(horizontal = 24.dp),
                         text = buildAnnotatedString {
-                            if (it.contains("-")) {
-                                withStyle(
-                                    SpanStyle(fontWeight = FontWeight.Bold)
-                                ) {
-                                    append(it.substringBefore("-"))
-                                }
-                                append("- ${it.substringAfter("-")}")
-                            } else {
-                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append(it)
-                                }
+                            withStyle(
+                                SpanStyle(fontWeight = FontWeight.Bold)
+                            ) {
+                                append(it.city)
                             }
+                            append("- ${it.country}")
                         },
                         style = TextStyle(fontSize = 20.sp)
                     )

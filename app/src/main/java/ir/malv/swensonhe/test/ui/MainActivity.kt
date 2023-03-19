@@ -1,8 +1,9 @@
-package ir.malv.swensonhe.test
+package ir.malv.swensonhe.test.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -22,15 +23,24 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
+import dagger.hilt.android.AndroidEntryPoint
+import ir.malv.swensonhe.test.R
+import ir.malv.swensonhe.test.repository.WeatherData
+import ir.malv.swensonhe.test.ui.components.DisplayDate
+import ir.malv.swensonhe.test.ui.components.DisplayTime
 import ir.malv.swensonhe.test.ui.components.SearchBox
+import ir.malv.swensonhe.test.ui.components.twoDayAfter
 import ir.malv.swensonhe.test.ui.theme.WeatherSwensonHeTheme
+import ir.malv.swensonhe.test.ui.viewmodel.MainViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,7 +50,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainContent()
+                    MainContent(
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -52,11 +64,16 @@ class MainActivity : ComponentActivity() {
  * FIXME(mahdi): At the moment all Ui is just one function. Must be extracted later on
  */
 @Composable
-fun MainContent() = Box(
+fun MainContent(
+    viewModel: MainViewModel
+) = Box(
     modifier = Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
     var showSearch by remember { mutableStateOf(false) }
+    val citySuggestionState by viewModel.citySuggestion.collectAsState()
+    val weatherData by viewModel.weatherData.collectAsState()
+
     // Background
     Image(
         modifier = Modifier.matchParentSize(),
@@ -71,6 +88,7 @@ fun MainContent() = Box(
 
     // Main content
     ForegroundContent(
+        weatherData = weatherData,
         onSearchClicked = { showSearch = true }
     )
 
@@ -92,23 +110,21 @@ fun MainContent() = Box(
     ) {
         SearchBox(
             onBackClicked = { showSearch = false },
-            onCloseSuggestions = { /* clear suggestions */ },
-            onSearchContentChanged = { println(it) },
+            onCloseSuggestions = viewModel::clearSuggestions,
+            onSearchContentChanged = viewModel::onTextQueryChanged,
             onCityClick = {
                 showSearch = false
                 println("City $it was clicked")
+                viewModel.onCitySelected(it)
             },
-            suggestionList = listOf(
-                "Semnan - Iran",
-                "Tehran - Iran",
-                "Hong kong - China"
-            )
+            suggestionList = citySuggestionState
         )
     }
 }
 
 @Composable
 private fun ForegroundContent(
+    weatherData: WeatherData,
     onSearchClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) = ConstraintLayout(
@@ -117,9 +133,7 @@ private fun ForegroundContent(
     val (time, search, weather, city, nextWeathers) = createRefs()
 
     // Time
-    Text(
-        text = "09:17 AM",
-        color = Color.White,
+    DisplayTime(
         modifier = Modifier.constrainAs(time) {
             top.linkTo(parent.top, margin = 24.dp)
             start.linkTo(parent.start)
@@ -145,11 +159,11 @@ private fun ForegroundContent(
 
     // Weather
     CurrentWeather(
-        temperature = 82.4f,
-        iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
-        message = "Clear fucking day here",
-        wind = 3,
-        humidity = 67,
+        temperature = weatherData.currentTemperature,
+        iconUrl = weatherData.day1IconUrl,
+        message = weatherData.currentText,
+        wind = weatherData.currentWindSpeed,
+        humidity = weatherData.currentHumidity,
         modifier = Modifier
             .constrainAs(weather) {
                 top.linkTo(parent.top)
@@ -168,8 +182,7 @@ private fun ForegroundContent(
                 bottom.linkTo(weather.top)
                 start.linkTo(parent.start)
             },
-        city = "San Francisco",
-        date = "Tuesday, 12 Apr 2022",
+        city = weatherData.city
     )
 
     // Future days
@@ -187,22 +200,22 @@ private fun ForegroundContent(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         NextWeather(
-            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
-            minWeather = 84f,
-            maxWeather = 86.4f,
+            iconUrl = weatherData.day1IconUrl,
+            minWeather = weatherData.day1Min,
+            maxWeather = weatherData.day1Max,
             day = "Today"
         )
         NextWeather(
-            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
-            minWeather = 84f,
-            maxWeather = 86.4f,
+            iconUrl = weatherData.day2IconUrl,
+            minWeather = weatherData.day2Min,
+            maxWeather = weatherData.day2Max,
             day = "Tomorrow"
         )
         NextWeather(
-            iconUrl = "https://cdn.weatherapi.com/weather/64x64/day/116.png",
-            minWeather = 84f,
-            maxWeather = 86.4f,
-            day = "Friday"
+            iconUrl = weatherData.day3IconUrl,
+            minWeather = weatherData.day3Min,
+            maxWeather = weatherData.day3Max,
+            day = twoDayAfter()
         )
     }
 }
@@ -212,7 +225,7 @@ private fun CurrentWeather(
     temperature: Float,
     iconUrl: String,
     message: String,
-    wind: Int,
+    wind: Float,
     humidity: Int,
     modifier: Modifier = Modifier,
 ) = Column(
@@ -272,7 +285,6 @@ private fun CurrentWeather(
 @Composable
 private fun CityAndDate(
     city: String,
-    date: String,
     modifier: Modifier = Modifier
 ) = Column(
     modifier = modifier,
@@ -283,9 +295,7 @@ private fun CityAndDate(
         color = Color.White,
         style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold)
     )
-    Text(
-        text = date,
-        color = Color.White,
+    DisplayDate(
         style = TextStyle(fontSize = 16.sp)
     )
 }
@@ -320,12 +330,4 @@ fun NextWeather(
         color = Color.White,
         style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainContentPreview() {
-    WeatherSwensonHeTheme {
-        MainContent()
-    }
 }
