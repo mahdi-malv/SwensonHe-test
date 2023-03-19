@@ -3,10 +3,14 @@ package ir.malv.swensonhe.test
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -23,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
+import ir.malv.swensonhe.test.ui.components.SearchBox
 import ir.malv.swensonhe.test.ui.theme.WeatherSwensonHeTheme
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +56,7 @@ fun MainContent() = Box(
     modifier = Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
+    var showSearch by remember { mutableStateOf(false) }
     // Background
     Image(
         modifier = Modifier.matchParentSize(),
@@ -64,13 +70,46 @@ fun MainContent() = Box(
     )
 
     // Main content
-    ForegroundContent()
+    ForegroundContent(
+        onSearchClicked = { showSearch = true }
+    )
 
-    // TODO(mahdi): Optional search bar as an overlay controlled by a State
+    AnimatedVisibility(
+        showSearch,
+        modifier = Modifier.align(Alignment.TopStart),
+        enter = slideInVertically(
+            initialOffsetY = { -it },
+            animationSpec = tween(
+                durationMillis = 500,
+            )
+        ),
+        exit = slideOutVertically(
+            targetOffsetY = { -it },
+            animationSpec = tween(
+                durationMillis = 500,
+            )
+        )
+    ) {
+        SearchBox(
+            onBackClicked = { showSearch = false },
+            onCloseSuggestions = { /* clear suggestions */ },
+            onSearchContentChanged = { println(it) },
+            onCityClick = {
+                showSearch = false
+                println("City $it was clicked")
+            },
+            suggestionList = listOf(
+                "Semnan - Iran",
+                "Tehran - Iran",
+                "Hong kong - China"
+            )
+        )
+    }
 }
 
 @Composable
 private fun ForegroundContent(
+    onSearchClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) = ConstraintLayout(
     modifier = modifier.fillMaxSize()
@@ -90,9 +129,7 @@ private fun ForegroundContent(
 
     // Search
     IconButton(
-        onClick = {
-            // TODO(mahdi): Handle click
-        },
+        onClick = onSearchClicked,
         modifier = Modifier.constrainAs(search) {
             end.linkTo(parent.end, margin = 12.dp)
             top.linkTo(time.top)
