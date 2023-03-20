@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -144,6 +145,103 @@ fun SearchBox(
                         contentDescription = "Close suggestions",
                         tint = darkButtonColor
                     )
+                }
+            }
+        }
+    }
+}
+
+@Suppress("LongParameterList") // Compose is allowed to do that
+@Composable
+fun SearchBoxTabletMode(
+    onBackClicked: () -> Unit,
+    onCityClick: (LocationData) -> Unit,
+    onSearchContentChanged: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    suggestionList: List<LocationData> = emptyList()
+) = Column(
+    modifier = modifier.width(260.dp)
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        var value by remember { mutableStateOf("") }
+        OutlinedTextField(
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White
+            ),
+            modifier = Modifier.weight(1f),
+            value = value,
+            onValueChange = {
+                onSearchContentChanged(it)
+                value = it
+            },
+            shape = RoundedCornerShape(15.dp),
+            singleLine = true,
+            label = { Text("Search city") },
+            trailingIcon = {
+                if (value.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            value = ""
+                            onSearchContentChanged("")
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            tint = darkButtonColor,
+                            contentDescription = "Clear search"
+                        )
+                    }
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            )
+        )
+        Spacer(Modifier.width(16.dp))
+        IconButton(
+            onClick = onBackClicked,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_back),
+                contentDescription = "Close search box",
+                tint = Color.White
+            )
+        }
+    }
+    if (suggestionList.isNotEmpty()) {
+        Spacer(Modifier.height(8.dp))
+        Card(
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier.padding(end = 48.dp) // 32 (icon) + 16 (padding)
+        ) {
+            Column() {
+                suggestionList.forEach {
+                    Text(
+                        modifier = Modifier
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = { onCityClick(it) }
+                            )
+                            .padding(horizontal = 24.dp),
+                        text = buildAnnotatedString {
+                            withStyle(
+                                SpanStyle(fontWeight = FontWeight.Bold)
+                            ) {
+                                append(it.city)
+                            }
+                            append("- ${it.country}")
+                        },
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
