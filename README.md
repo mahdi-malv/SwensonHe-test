@@ -1,5 +1,5 @@
 # Ui code challenge for SwensonHe company
-> <img src="https://img.shields.io/badge/Status-Only%20tablet%20Ui%20remained-yellowgreen" />
+> <img src="https://img.shields.io/badge/Status-Ready%20to%20be%20reviewed-green" />
 
 @swensonhe-evaluation , You're added only to see the flow. I will email when you're supposed to do the review
 
